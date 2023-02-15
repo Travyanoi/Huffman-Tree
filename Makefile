@@ -7,6 +7,6 @@ encode:
 decode:
 	./bin/huffman -d Here_decoded_file.txt bin/huffman.hc
 clean:
-	rm bin/huffman && rm *.hc
+	rm bin/huffman && rm bin/*.hc
 -include $(DEPS)
 
