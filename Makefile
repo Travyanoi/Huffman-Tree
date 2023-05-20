@@ -1,12 +1,7 @@
 .PHONY: all
 all:
+	mkdir -p bin decoded_file
 	gcc -Wall -o bin/huffman files/*.c
-.PHONY: clean encode decode
-encode:
-	./bin/huffman -c bin/huffman.hc Put_here_text_for_encoding.txt
-decode:
-	./bin/huffman -d Here_decoded_file.txt bin/huffman.hc
+.PHONY: clean
 clean:
-	rm bin/huffman && rm bin/*.hc
--include $(DEPS)
-
+	rm -r bin decoded_file

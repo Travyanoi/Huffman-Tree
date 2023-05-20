@@ -2,11 +2,11 @@
 #include "encode.h"
 #include "decode.h"
 
-short get_nb_char(FILE *input_file)
+short get_num_of_unique_char(FILE *input_file)
 {
-    short nb_char;
-    fread(&nb_char, sizeof(short), 1, input_file);
-    return nb_char;
+    short num_of_unique_char;
+    fread(&num_of_unique_char, sizeof(short), 1, input_file);
+    return num_of_unique_char;
 }
 
 void get_info_from_binary_file(FILE *input_file, data *info, short size)
@@ -17,17 +17,17 @@ void get_info_from_binary_file(FILE *input_file, data *info, short size)
     }
 }
 
-void get_huffman_code_in_tree(htree *root, unsigned bin_code, unsigned nbits)
+void put_huffman_code_in_tree(htree *root, unsigned bin_code, unsigned nbits)
 { 
     if (!root->left && !root->right) {
         root->hcode = bin_code; root->nbits = nbits;
         return;
     }
     if (root->left){       
-        get_huffman_code_in_tree(root->left, (bin_code << 1), nbits + 1);
+        put_huffman_code_in_tree(root->left, (bin_code << 1), nbits + 1);
     }
     if (root->right){
-        get_huffman_code_in_tree(root->right, (bin_code << 1) + 1, nbits + 1);
+        put_huffman_code_in_tree(root->right, (bin_code << 1) + 1, nbits + 1);
     }
 }
 
@@ -78,18 +78,18 @@ void decompression(const char *outputname, const char *inputname)
     FILE *input_file = fopen(inputname, "rb");
     FILE *output_file = fopen(outputname, "w");
 
-    short nb_char = get_nb_char(input_file); // Кол-во уникальных символов
-    data info[nb_char];
-    get_info_from_binary_file(input_file, info, nb_char);
-    array_sort(info, nb_char);
+    short num_of_unique_char = get_num_of_unique_char(input_file); // Кол-во уникальных символов
+    data info[num_of_unique_char];
+    get_info_from_binary_file(input_file, info, num_of_unique_char);
+    array_sort(info, num_of_unique_char);
 
     hqueue *priority_queue = NULL;
-    priority_queue = fill_queue_with_tree(priority_queue, info, nb_char);
+    priority_queue = fill_queue_with_tree(priority_queue, info, num_of_unique_char);
 
     htree *huffman_tree = NULL;
     huffman_tree = build_huffman_tree(priority_queue);
 
-    get_huffman_code_in_tree(huffman_tree, 0, 0);
+    put_huffman_code_in_tree(huffman_tree, 0, 0);
 
     decoding(input_file, output_file, huffman_tree);
 
